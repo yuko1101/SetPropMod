@@ -1,26 +1,26 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod",
+  "id": "setprop",
   "version": "${version}",
-  "name": "ExampleMod",
-  "description": "Your mod description.",
+  "name": "SetPropMod",
+  "description": "A LunarCore mod which adds /setprop command.",
   "authors": [
-    "You"
+    "yuko1101"
   ],
   "contact": {
-    "website": "https://example.com",
-    "repo": "https://example.com/you/your_repo"
+    "website": "https://github.com/yuko1101/SetPropMod",
+    "repo": "https://github.com/yuko1101/SetPropMod"
   },
   "license": "MIT",
-  "icon": "assets/examplemod/icon.png",
+  "icon": "assets/setprop/icon.png",
   "environment": "server",
   "entrypoints": {
     "main": [
-      "com.example.examplemod.ExampleMod"
+      "io.github.yuko1101.setprop.SetPropMod"
     ]
   },
   "mixins": [
-    "examplemod.mixins.json"
+    "setprop.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${loader_version}",
