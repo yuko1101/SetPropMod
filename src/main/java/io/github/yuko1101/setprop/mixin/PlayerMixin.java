@@ -1,69 +1,42 @@
 package io.github.yuko1101.setprop.mixin;
 
 import emu.lunarcore.game.player.Player;
-import emu.lunarcore.server.game.GameSession;
 import io.github.yuko1101.setprop.extension.PlayerExtension;
 import io.github.yuko1101.setprop.prop.BooleanProp;
-import io.github.yuko1101.setprop.prop.DefinedProp;
+import io.github.yuko1101.setprop.prop.IntegerProp;
 import io.github.yuko1101.setprop.prop.Prop;
+import io.github.yuko1101.setprop.prop.PropMap;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Nullable;
 
 @Mixin(value = Player.class, remap = false)
 public class PlayerMixin implements PlayerExtension {
-    @Unique private final Map<String, Prop<?>> props = new HashMap<>();
+    @Unique
+    private transient final PropMap props = new PropMap();
 
     @Unique
     @Override
-    public <T> void setPropMod$putProp(Prop<T> prop, List<String> aliases) {
-        props.put(prop.getName().toLowerCase(), prop);
-        for (var alias : aliases) {
-            props.put(alias.toLowerCase(), prop);
-        }
+    public PropMap setPropMod$getProps() {
+        return props;
     }
 
     @Unique
     @Override
-    public Prop<?> setPropMod$getProp(String alias) {
-        if (props.isEmpty()) {
-            initProps();
-        }
-
-        return props.get(alias.toLowerCase());
+    @Nullable
+    public Prop<?> setPropMod$setProp(String name, int value) {
+        var prop = (IntegerProp) props.getProp(name);
+        if (prop != null) prop.set(value, (Player)(Object) this);
+        return prop;
     }
 
     @Unique
     @Override
-    public Prop<?> setPropMod$getProp(DefinedProp definedProp) {
-        return setPropMod$getProp(definedProp.createProp(null).getName());
-    }
-
-    @Unique
-    @Override
-    public boolean setPropMod$hasProp(String alias) {
-        return setPropMod$getProp(alias) != null;
-    }
-
-    @Unique
-    @Override
-    public boolean setPropMod$getBoolean(DefinedProp definedProp) {
-        return ((BooleanProp) setPropMod$getProp(definedProp)).get();
-    }
-
-    @Unique
-    @Override
-    public void setPropmod$setBoolean(DefinedProp definedProp, boolean value) {
-        ((BooleanProp) setPropMod$getProp(definedProp)).set(value);
-    }
-
-    @Unique
-    private void initProps() {
-        for (var definedProp: DefinedProp.values()) {
-            setPropMod$putProp(definedProp.createProp((Player)(Object) this), definedProp.aliases);
-        }
+    @Nullable
+    public Prop<?> setPropMod$setProp(String name, boolean value) {
+        var prop = (BooleanProp) props.getProp(name);
+        if (prop != null) prop.set(value, (Player)(Object) this);
+        return prop;
     }
 }

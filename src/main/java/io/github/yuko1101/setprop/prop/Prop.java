@@ -1,29 +1,32 @@
 package io.github.yuko1101.setprop.prop;
 
+import dev.morphia.annotations.Entity;
 import emu.lunarcore.game.player.Player;
+import io.github.yuko1101.setprop.util.TriConsumer;
 
 import javax.annotation.Nullable;
-import java.util.function.BiConsumer;
+import java.util.List;
 
+@Entity(useDiscriminator = false)
 public abstract class Prop<T> {
     private final String name;
+    private final List<String> aliases;
     private final T defaultValue;
-    @Nullable
-    public Player player;
 
     /**
      * This will be called right before the value is changed.
      * The first argument is the prop that is being changed.
      * The second argument is the new value.
      */
-    protected final BiConsumer<Prop<T>, T> onChange;
+    @Nullable
+    protected TriConsumer<Prop<T>, T, Player> onChange;
 
     private T value;
 
-    public Prop(String name, T defaultValue, @Nullable Player player, BiConsumer<Prop<T>, T> onChange) {
+    public Prop(String name, List<String> aliases, T defaultValue, @Nullable TriConsumer<Prop<T>, T, Player> onChange) {
         this.name = name;
+        this.aliases = aliases;
         this.defaultValue = defaultValue;
-        this.player = player;
         this.value = defaultValue;
         this.onChange = onChange;
     }
@@ -32,12 +35,16 @@ public abstract class Prop<T> {
         return name;
     }
 
+    public List<String> getAliases() {
+        return aliases;
+    }
+
     public T getDefaultValue() {
         return defaultValue;
     }
 
-    public T set(T value) {
-        if (this.value != value) onChange.accept(this, value);
+    public T set(T value, Player player) {
+        if (this.value != value && onChange != null) onChange.accept(this, value, player);
         this.value = value;
         return value;
     }
@@ -51,7 +58,10 @@ public abstract class Prop<T> {
     }
 
     @Nullable
-    abstract public T parse(String value);
+    abstract public T parse(String value, Player player);
 
-    abstract public Prop<T> copyWith(@Nullable Player player);
+    /**
+     * This method does not copy the value from the original.
+     */
+    abstract public Prop<T> clone();
 }

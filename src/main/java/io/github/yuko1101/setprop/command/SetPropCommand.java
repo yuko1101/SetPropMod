@@ -25,13 +25,13 @@ public class SetPropCommand implements CommandHandler {
         var player = args.getTarget();
         var playerMixin = (PlayerExtension) player;
 
-        var prop = playerMixin.setPropMod$getProp(propName);
+        var prop = playerMixin.setPropMod$getProps().getProp(propName);
         if (prop == null) {
             args.sendMessage("Unknown property: " + propName);
             return;
         }
 
-        var parsedValue = prop.parse(value);
+        var parsedValue = prop.parse(value, player);
         if (parsedValue == null) {
             args.sendMessage("Invalid value: " + value);
         } else {

@@ -1,30 +1,29 @@
 package io.github.yuko1101.setprop.prop;
 
 import emu.lunarcore.game.player.Player;
-import org.jetbrains.annotations.Nullable;
+import io.github.yuko1101.setprop.util.TriConsumer;
 
-import java.util.function.BiConsumer;
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class IntegerProp extends Prop<Integer> {
 
-    public IntegerProp(String name, Integer defaultValue, @Nullable Player player, BiConsumer<Prop<Integer>, Integer> onChange) {
-        super(name, defaultValue, player, onChange);
+    public IntegerProp(String name, List<String> aliases, Integer defaultValue, @Nullable TriConsumer<Prop<Integer>, Integer, Player> onChange) {
+        super(name, aliases, defaultValue, onChange);
     }
 
     @Nullable
     @Override
-    public Integer parse(String value) {
+    public Integer parse(String value, Player player) {
         try {
-            return this.set(Integer.parseInt(value));
+            return this.set(Integer.parseInt(value), player);
         } catch (NumberFormatException e) {
             return null;
         }
     }
 
     @Override
-    public Prop<Integer> copyWith(Player player) {
-        var prop = new IntegerProp(getName(), getDefaultValue(), player, onChange);
-        prop.set(get());
-        return prop;
+    public Prop<Integer> clone() {
+        return new IntegerProp(getName(),getAliases(), getDefaultValue(), onChange);
     }
 }
